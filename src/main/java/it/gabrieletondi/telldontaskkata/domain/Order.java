@@ -25,7 +25,11 @@ public class Order {
     }
 
     public Order() {
-        new Order("EUR");
+        this.status = OrderStatus.CREATED;
+        this.items = new ArrayList<>();
+        this.currency = "EUR";
+        this.total = new BigDecimal("0.00");
+        this.tax = new BigDecimal("0.00");
     }
 
     public BigDecimal getTotal() {
@@ -49,7 +53,7 @@ public class Order {
         return status;
     }
 
-    public void setStatus(OrderStatus status) {
+    private void setStatus(OrderStatus status) {
 
         if (this.status != null) {
             if (this.status.equals(OrderStatus.SHIPPED)) {
@@ -69,15 +73,14 @@ public class Order {
     }
 
     public void reject() {
-        if(this.status.equals(OrderStatus.APPROVED)) {
+        if(this.status != null && this.status.equals(OrderStatus.APPROVED)) {
             throw new ApprovedOrderCannotBeRejectedException();
         }
         this.setStatus(OrderStatus.REJECTED);
-
     }
 
     public void approve() {
-        if(this.status.equals(OrderStatus.REJECTED)) {
+        if(this.status != null && this.status.equals(OrderStatus.REJECTED)) {
             throw new RejectedOrderCannotBeApprovedException();
         }
         this.setStatus(OrderStatus.APPROVED);
@@ -88,5 +91,9 @@ public class Order {
         this.total = this.total.add(orderItem.getTaxedAmount());
         this.tax = this.tax.add(orderItem.getTax());
 
+    }
+
+    public void ship() {
+        this.setStatus(OrderStatus.SHIPPED);
     }
 }
